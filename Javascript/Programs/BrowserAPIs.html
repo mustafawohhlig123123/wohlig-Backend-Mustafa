@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div>
+        <h1>Learning Local Storage</h1>
+    </div>
+    <script>
+        localStorage.setItem("username","mustafa");
+        let name = localStorage.getItem("username");
+        console.log("This is - ", name);
+        localStorage.removeItem("username");//to remove the set username in local storage 
+        localStorage.clear();//to clear all setitems in local storage
+        //can also use sessionstorage which is similar to local storage except that session storage is lost when window or browser is closed
+        // sessionStorage.setItem("username","mustafa"); 
+        // const sessiondata = sessionStorage.getItem("username");
+        // console.log(sessiondata);
+        // sessionStorage.clear()
+        document.cookie = "username=Mustafa Final; expires=Fri, 31 Dec 2025 12:00:00 UTC; path=/";
+        console.log(document.cookie);
+        document.cookie = "username=Mustafa New; expires=Fri, 31 Dec 2025 12:00:00 UTC; path=/";
+        document.cookie = "username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                console.log(`latitude: ${position.coords.latitude}`);
+                console.log(`longitude: ${position.coords.longitude}`);
+
+            },
+            (error) => {
+                console.error(`Error: ${error.message}`);
+            }
+        );
+    </script>
+</body>
+</html>
