@@ -68,7 +68,7 @@ function playGame() {
                 return;
             }
 
-            if (isDraw()) {
+            if (isgtgDraw()) {
                 displayBoard();
                 console.log("It's a draw!");
                 rl.close();
