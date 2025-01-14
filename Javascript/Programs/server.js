@@ -14,6 +14,7 @@ app.use(express.json());
 const itemSchema = new mongoose.Schema({
   name: { type: String, required: true },
   description: { type: String, default: '' },
+
   quantity: { type: Number, default: 0 },
 });
 
