@@ -1,5 +1,5 @@
 const express = require('express');
-const connectDB = require('./db'); // Adjust the path as needed
+const connectDB = require('./db'); 
 const mongoose = require('mongoose');
 
 // Connect to MongoDB Atlas
