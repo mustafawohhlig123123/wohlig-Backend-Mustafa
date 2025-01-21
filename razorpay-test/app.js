@@ -1,50 +1,89 @@
 const express = require('express');
+const axios = require('axios');
 const bodyParser = require('body-parser');
-const Razorpay = require('razorpay');
 
 const app = express();
 app.use(bodyParser.json());
 
-const razorpay = new Razorpay({
-    key_id: 'rzp_test_1DP5mmOlF5G5ag',
-    key_secret: 'rzp_test_SECRET', 
+// PayPal sandbox credentials
+const PAYPAL_CLIENT_ID = 'ARTlK7b_d_UDmtYHP-Z1IAgflUMYJtT1l0UTshrYgE9qgI8WB9FNnVJs1Yns6mVx_1niZvdRKYbIOWt2';
+const PAYPAL_SECRET = 'EGT2hJFXV6j2lU-EOwHbdSA33Vt2yajxngoxCE9k72TuzK07M0Ud6hzEQDaIrPUOz6zach3DgcplSKZ-';
+
+// PayPal URL for authorization
+const PAYPAL_API_URL = 'https://api.sandbox.paypal.com';
+
+
+const getAccessToken = async () => {
+  try {
+    const response = await axios.post(
+      `${PAYPAL_API_URL}/v1/oauth2/token`,
+      'grant_type=client_credentials',
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Authorization': `Basic ${Buffer.from(`${PAYPAL_CLIENT_ID}:${PAYPAL_SECRET}`).toString('base64')}`
+        }
+      }
+    );
+    return response.data.access_token;
+  } catch (error) {
+    console.error('Error getting access token:', error);
+  }
+};
+
+// Route to create a payment
+app.post('/create-payment', async (req, res) => {
+  const { amount, currency } = req.body;
+
+  try {
+    // Get PayPal access token
+    const accessToken = await getAccessToken();
+
+    // Create payment data
+    const paymentData = {
+      intent: 'sale',
+      payer: { payment_method: 'paypal' },
+      transactions: [
+        {
+          amount: {
+            total: amount,
+            currency: currency || 'USD'
+          },
+          description: 'Test Payment'
+        }
+      ],
+      redirect_urls: {
+        return_url: 'http://localhost:3000/payment-success',
+        cancel_url: 'http://localhost:3000/payment-cancelled'
+      }
+    };
+
+    // Make API request to create payment
+    const response = await axios.post(
+      `${PAYPAL_API_URL}/v1/payments/payment`,
+      paymentData,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      }
+    );
+
+    res.json(response.data); // Send the response with payment details
+  } catch (error) {
+    console.error('Error creating payment:', error);
+    res.status(500).send('Error creating payment');
+  }
 });
 
-
-app.post('/create-order', async (req, res) => {
-    const { amount, currency } = req.body;
-
-    try {
-        const order = await razorpay.orders.create({
-            amount: amount * 100, 
-            currency: currency || 'INR', // Default currency is INR
-            receipt: `receipt_${Date.now()}`,
-        });
-
-        res.status(200).json(order); // Return the order object
-    } catch (error) {
-        console.error('Error creating Razorpay order:', error);
-        res.status(500).json({ error: error.message });
-    }
+// Route for successful payment
+app.get('/payment-success', (req, res) => {
+  res.send('Payment Successful');
 });
 
-
-app.post('/verify-payment', (req, res) => {
-    const crypto = require('crypto');
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
-
-    const hmac = crypto.createHmac('sha256', 'rzp_test_SECRET');
-    hmac.update(`${razorpay_order_id}|${razorpay_payment_id}`);
-    const generatedSignature = hmac.digest('hex');
-
-    if (generatedSignature === razorpay_signature) {
-        res.status(200).json({ success: true });
-    } else {
-        res.status(400).json({ success: false, message: 'Invalid signature' });
-    }
+// Route for cancelled payment
+app.get('/payment-cancelled', (req, res) => {
+  res.send('Payment Cancelled');
 });
-
 const PORT = 3000;
 app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
