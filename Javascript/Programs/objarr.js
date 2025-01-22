@@ -18,6 +18,8 @@ console.log(person["age"]);//bracket notation used when dynamic value or string
 //array methods
 let arr = [3,4,5]
 arr.push(6)
+console.log("abc");
+
 console.log(arr);
 arr.pop()
 console.log(arr)
