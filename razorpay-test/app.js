@@ -1,8 +1,13 @@
 const express = require('express');
 const axios = require('axios');
 const bodyParser = require('body-parser');
+const cors = require('cors'); // Import cors
 
 const app = express();
+
+// Use CORS middleware to allow cross-origin requests
+app.use(cors());
+
 app.use(bodyParser.json());
 
 // PayPal sandbox credentials
@@ -11,7 +16,6 @@ const PAYPAL_SECRET = 'EGT2hJFXV6j2lU-EOwHbdSA33Vt2yajxngoxCE9k72TuzK07M0Ud6hzEQ
 
 // PayPal URL for authorization
 const PAYPAL_API_URL = 'https://api.sandbox.paypal.com';
-
 
 const getAccessToken = async () => {
   try {
@@ -74,7 +78,7 @@ app.post('/create-payment', async (req, res) => {
   }
 });
 
-// Route for successful payment
+// Route for successful payment (after the user completes payment)
 app.get('/payment-success', (req, res) => {
   res.send('Payment Successful');
 });
@@ -83,6 +87,7 @@ app.get('/payment-success', (req, res) => {
 app.get('/payment-cancelled', (req, res) => {
   res.send('Payment Cancelled');
 });
+
 const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
