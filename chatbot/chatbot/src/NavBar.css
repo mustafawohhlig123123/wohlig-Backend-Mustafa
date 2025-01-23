@@ -1,0 +1,14 @@
+.navbar {
+    background-color: #003366; /* Dark blue color */
+    color: white;
+    padding: 1rem;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    font-family: Arial, sans-serif;
+}
+
+.navbar-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
